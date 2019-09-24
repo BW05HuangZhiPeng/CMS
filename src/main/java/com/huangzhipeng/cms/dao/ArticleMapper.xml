@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huangzhipeng.cms.dao.ArticleMapper">
+	<!--## 增加 ## -->
+
+	<insert id="add" parameterType="Article" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert into
+		cms_article(status,created,hits,hot,deleted,content,title,picture,channel_id,category_id,user_id)
+
+		values(0,now(),0,0,0,#{content},#{title},#{picture},#{channelId},#{categoryId},#{userId})
+	</insert>
+	
+	<!--## 删除 ## -->
+
+	<!--## 修改 ## -->
+	
+	<update id="updateStatus">
+		update cms_article set status=#{status} ,
+		updated=now() where id=#{id}
+	</update>
+
+	<update id="updateHot">
+		update cms_article set hot=#{hot} , updated=now()
+		where id=#{id}
+	</update>
+	
+	<update id="increaseCommentCnt">
+		update cms_article set commentCnt = commentCnt + 1 where id=#{value}
+	</update>
+	
+	<update id="updatea">
+		update cms_article set title=#{title},content=#{content1},channel_id=#{channelId},category_id=#{categoryId} where id=#{id}
+	</update>
+	<!--## 查询 ## -->
+
+	<select id="findById" resultType="Article">
+		select
+		a.id,a.content,a.title,a.picture,a.channel_id AS
+		channelId,a.category_id categoryId,a.user_id AS userId,a.
+		hits,a.hot,a.status,a.deleted,a.created,a.updated, u.username,
+		GROUP_CONCAT(t.tagname) as tags,a.commentCnt
+		from cms_article as a left join
+		cms_user u on u.id=a.user_id
+		left join cms_article_tag_middle as atm on
+		atm.aid=a.id
+		LEFT join cms_tag as t on t.id=atm.tid
+		where a.id=#{value}
+		and a.deleted=0
+		group by a.id
+	</select>
+
+	<!-- 显示频道或者分类下边的文章列表 -->
+	<select id="list" resultType="Article">
+		select a.id,a.title,a.picture,a.channel_id AS channelId,a.category_id
+		categoryId,a.user_id AS userId,a.
+		hits,a.hot,a.status,a.deleted,a.created,a.updated, u.username,
+		GROUP_CONCAT(t.tagname) as tags
+		from cms_article as a left join
+		cms_user u on u.id=a.user_id
+		left join cms_article_tag_middle as atm on
+		atm.aid=a.id
+		LEFT join cms_tag as t on t.id=atm.tid
+		<where>
+			a.status=2 and a.deleted=0
+			<if test="channelId!=0">
+				and a.channel_id=#{channelId}
+			</if>
+			<if test="catId!=0">
+				and a.category_id=#{catId}
+			</if>
+		</where>
+		group by a.id
+		order by a.created desc
+	</select>
+
+	<select id="listByUser" resultType="Article">
+		select
+		a.id,a.content,a.title,a.picture,a.channel_id AS
+		channelId,a.category_id categoryId,a.user_id AS userId,a.
+		hits,a.hot,a.status,a.deleted,a.created,a.updated, cat.`name` as
+		catName , chn.`name` as chnName, GROUP_CONCAT(t.tagname) as tags
+		from
+		cms_article as a
+		left join cms_channel as chn on chn.id=a.channel_id
+		left join cms_category as cat on cat.id=a.category_id
+		left join
+		cms_article_tag_middle as atm on atm.aid=a.id
+		LEFT join cms_tag as t on
+		t.id=atm.tid
+		where a.user_id=#{userId} and a.deleted=0
+		group by a.id
+	</select>
+
+	<select id="checkList" resultType="Article">
+		select
+		a.id,a.content,a.title,a.picture,a.channel_id AS
+		channelId,a.category_id categoryId,a.user_id AS userId,
+		a.hits,a.hot,a.status,a.deleted,a.created,a.updated, cat.`name` as
+		catName ,
+		chn.`name` as chnName, GROUP_CONCAT(t.tagname) as tags
+		,u.username
+		from cms_article as a
+		left join cms_user u on u.id=a.user_id
+		left join cms_channel as chn on chn.id=a.channel_id
+		left join
+		cms_category as cat on cat.id=a.category_id
+		left join
+		cms_article_tag_middle as atm on atm.aid=a.id
+		LEFT join cms_tag as t on
+		t.id=atm.tid
+		<where>
+			<if test="status!=null and status!='' and status!=0">
+				and a.status=#{status}
+			</if>
+			and a.deleted=0
+		</where>
+		group by a.id
+		order
+		by a.created desc
+	</select>
+
+	<select id="hotList" resultType="Article">
+		select a.id,a.commentCnt,a.content,a.title,a.picture,a.channel_id AS channelId,a.category_id categoryId,a.user_id AS userId,
+			  a.hits,a.hot,a.status,a.deleted,a.created,a.updated, cat.`name` as catName ,
+			   chn.`name` as chnName, GROUP_CONCAT(t.tagname) as tags ,u.username
+		      from cms_article as a 
+		        left join cms_user u on u.id=a.user_id 
+				left join cms_channel as chn on chn.id=a.channel_id 
+				left join cms_category as cat on cat.id=a.category_id
+              left join cms_article_tag_middle as atm on atm.aid=a.id
+              LEFT join cms_tag as t on t.id=atm.tid  
+              where a.hot>0 <!-- and a.status=2 and a.deleted=0  -->
+              <if test='title!=""'>
+              	  and a.title like concat('%',#{title},'%')
+              </if>
+			  group by a.id 
+			  order by  a.hot desc,  a.created desc
+	</select>
+
+	<select id="lastArticles" resultType="Article">
+		select
+		a.id,a.content,a.title,a.picture,a.channel_id AS
+		channelId,a.category_id categoryId,a.user_id AS userId,
+		a.hits,a.hot,a.status,a.deleted,a.created,a.updated, cat.`name` as
+		catName ,
+		chn.`name` as chnName, GROUP_CONCAT(t.tagname) as tags
+		,u.username
+		from cms_article as a
+		left join cms_user u on u.id=a.user_id
+		left join cms_channel as chn on chn.id=a.channel_id
+		left join
+		cms_category as cat on cat.id=a.category_id
+		left join cms_article_tag_middle as
+		atm on atm.aid=a.id
+		LEFT join cms_tag as t on t.id=atm.tid
+		where
+		a.status=2 and a.deleted=0
+		group by a.id
+		order by a.created desc
+		limit 5
+	</select>
+</mapper>

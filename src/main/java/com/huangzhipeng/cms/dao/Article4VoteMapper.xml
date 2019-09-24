@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huangzhipeng.cms.dao.Article4VoteMapper">
+	<!--## 增加 ## -->
+
+	<insert id="add" parameterType="Article4Vote">
+		insert into cms_article_vote
+		(title,content)
+		values(#{title},#{content})
+	</insert>
+
+	<insert id="vote">
+		insert into cms_vote(article_id,user_id,`option`)
+		values(#{articleId},#{userId},#{option})
+	</insert>
+
+	<!--## 删除 ## -->
+
+	<!--## 修改 ## -->
+
+	<!--## 查询 ## -->
+
+	<select id="getById" resultType="Article4Vote">
+		select * from cms_article_vote
+		where id=#{value}
+	</select>
+
+	<select id="getVoteStatics" resultType="VoteStatic">
+		select count(1) as
+		voteNum , `option` as optionKey FROM cms_vote where
+		article_id=#{value}
+		GROUP BY `option`
+	</select>
+	
+	<select id="list" resultType="Article4Vote">
+		select * from cms_article_vote order by id desc limit 10
+	</select>
+</mapper>

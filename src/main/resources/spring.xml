@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+<!--  扫描包-->
+<context:component-scan base-package="com.huangzhipeng.cms">
+	<!-- 排除要要扫描的controller -->
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+</context:component-scan>
+<!-- 数据源 -->
+ <context:property-placeholder location="classpath:db.properties"/>
+ <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+     <property name="url" value="${jdbc.url}"></property>
+     <property name="driverClassName" value="${jdbc.driver}"></property>
+     <property name="username" value="${jdbc.user}"></property>
+     <property name="password" value="${jdbc.password}"></property>
+   </bean>
+
+<!-- 	SqlSessionFactory-->
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	<!-- 注入数据源 -->
+	<property name="dataSource" ref="dataSource"></property>
+	<!-- 加载mybatis的核心配置文件 -->
+	<property name="configLocation" value="classpath:mybatis.xml"></property>
+</bean>
+<!-- 事务 -->
+<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<property name="dataSource" ref="dataSource"></property>
+</bean>
+
+<!-- AOP -->
+<tx:advice transaction-manager="transactionManager" id="txAdvice">
+		  <!-- 事务属性配置 -->
+		  <tx:attributes>
+		  	<tx:method name="get*" read-only="true"/>
+		  	<tx:method name="select*" read-only="true"/>
+		  	<tx:method name="list*" read-only="true"/>
+		  	<tx:method name="load*" read-only="true"/>
+		  	<tx:method name="find*" read-only="true"/>
+		  	<tx:method name="query*" read-only="true"/>
+		  	<tx:method name="*" propagation="REQUIRED"/>
+		  </tx:attributes>
+</tx:advice>
+
+
+<aop:config>
+	 <!-- 配置切点表达式 -->
+	<aop:pointcut expression="execution(* com.huangzhipeng.cms.service.impl.*.*(..))" id="point"/>
+	 <!-- 关联事务 -->
+	 <aop:advisor advice-ref="txAdvice" pointcut-ref="point"/>
+</aop:config>
+<!-- 扫描mapper文件 -->
+<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	<property name="basePackage" value="com.huangzhipeng.cms.dao"></property>
+</bean>
+
+</beans>
