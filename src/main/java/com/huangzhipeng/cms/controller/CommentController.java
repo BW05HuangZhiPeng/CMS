@@ -83,7 +83,7 @@ public class CommentController {
 	@GetMapping("getlist")
 	public String getlist(HttpServletRequest request,
 			Integer articleId,@RequestParam(defaultValue="1") Integer page,
-			@RequestParam(defaultValue="3") Integer pageSize){
+			@RequestParam(defaultValue="10") Integer pageSize){
 		
 		PageInfo<Comment> commentsByArticle = commentService.getCommentsByArticle(articleId, page, pageSize);
 		System.out.println(commentsByArticle);

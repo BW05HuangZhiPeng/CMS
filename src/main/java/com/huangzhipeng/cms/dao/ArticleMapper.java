@@ -112,6 +112,16 @@ public interface ArticleMapper {
 	 * @return
 	 */
 	List<Article> lastArticles();
+
+	/**   
+	 * @Title:         getcommentdesc   
+	 * @Description:   按照评论数量倒序排序
+	 * @param:         @return      
+	 * @return:        List<Article>     
+	 * @date:          2019年9月25日 上午10:08:28   
+	 * @throws   
+	 */
+	List<Article> getcommentdesc();
 	
 	
 	

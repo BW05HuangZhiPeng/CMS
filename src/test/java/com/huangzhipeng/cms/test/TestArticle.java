@@ -1,5 +1,6 @@
 package com.huangzhipeng.cms.test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
@@ -53,6 +54,33 @@ public class TestArticle  extends TestBase{
 			
 			
 		}
+	}
+	
+	@Test
+	public void TestArticle() {
+		List<String> fileList = FileUtil.getFileList("C:\\Users\\小五\\Desktop\\大数据系-9月-专高1-《项目开发管理+CMS系统》\\大数据系-9月-专高1-《项目开发管理+CMS系统》-月考（技能）\\大数据系-9月-专高1-《项目开发管理+CMS系统》-月考（技能）附件");
+		Random random = new Random();
+		for (String string : fileList) {
+			
+			try {
+				Article article = new Article();
+				String content;
+				content = FileUtil.readFile(string);
+				System.out.println(content);
+				article.setContent(content);
+				article.setTitle(string.substring(string.lastIndexOf('\\')+1,string.lastIndexOf('.')));
+				article.setHits(10+random.nextInt(90));
+				article.setHot(random.nextInt(2));
+				article.setUserId(46);
+				System.err.println(article);
+				arServie.add(article);
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	
 

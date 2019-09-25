@@ -97,7 +97,7 @@ function publish(){
 		 var formData = new FormData($( "#form" )[0]);
 		//改变formData的值
 		//editor1.html() 是富文本的内容
-		 formData.set("content",editor1.html());
+		 formData.set("content1",editor1.html());
 		
 		$.ajax({
 			type:"post",
@@ -110,7 +110,7 @@ function publish(){
 			success:function(obj){
 				if(obj)
 			    {
-					alert("修改成功!")
+					alert("修改成功!");
 					// location="/article/listMyArticle";
 					$("#center").load("/article/listMyArticle")
 				}else{
@@ -121,80 +121,63 @@ function publish(){
 		})
 	}
 	
-/* 	
-	$.post("/article/publish",$("form").serialize()+"&content="+editor1.html(),function(obj){
-		if(obj)
-		alert("发布成功");
-		else
-		alert("发布失败")
-	}) 
-	
-}
-		*/
-
-
 $(function(){
 
-
-
-
-
+	
+	
 	//自动加载文章的栏目
- 	$.ajax({
+	$.ajax({
 		type:"get",
 		url:"/article/getAllChn",
 		success:function(list){
 			$("#channel").empty();
 			for(var i in list){
-				if(${article.channelId}==list[i].id){
-					$("#channel").append("<option selected value='"+list[i].id+"'>"+list[i].name+"</option>")
-					
-					// 频道的回显
-					 $("#category").empty();
-						//根据ID 获取栏目下的分类
-					 $.get("/article/getCatsByChn",{channelId:${article.channelId}},function(catlist){
-						
-						 for(var cati in catlist){
-						  	 if(catlist[cati].id==${article.categoryId}){
-								 $("#category").append("<option selected value='"+catlist[cati].id+"'>"+catlist[cati].name+"</option>")
-						 	 }else{
-						 		$("#category").append("<option value='"+catlist[cati].id+"'>"+catlist[cati].name+"</option>")
-						 	 }
-							 //处理回显
-							
-						 }
-						 
-					 })
-					
-					
-				}else{
-					$("#channel").append("<option value='"+list[i].id+"'>"+list[i].name+"</option>")
+				var a='${article.channelId}';
+				if (a==list[i].id) {
+			      $("#channel").append("<option selected='selected' value='"+list[i].id+"'>"+list[i].name+"</option>")
+				}else{ 
+				  $("#channel").append("<option value='"+list[i].id+"'>"+list[i].name+"</option>")
 				}
-				
 			}
+			
+		 	var cid=$("#channel").val();
+			$.get("/article/getCatsByChn",{channelId:cid},function(list){
+				
+				 for(var i in list){
+					 var b='${article.categoryId}';
+					
+					if (b==list[i].id) {
+						$("#category").append("<option selected='selected' value='"+list[i].id+"'>"+list[i].name+"</option>")
+					}else{  
+				      $("#category").append("<option value='"+list[i].id+"'>"+list[i].name+"</option>")
+					}
+
+				 }
+				 
+			 }) 
 		}
 		
 	})
- 	
+	
 	
 	
 	//为栏目添加绑定事件
-	 $("#channel").change(function(){
-		 //先清空原有的栏目下的分类
+	$("#channel").change(function(){
+		 
+	var cid =$(this).val();//获取当前的下拉框的id
+	//根据ID 获取栏目下的分类
+	 $.get("/article/getCatsByChn",{channelId:cid},function(list){
+		//先清空原有的栏目下的分类
 		 $("#category").empty();
-		var cid =$(this).val();//获取当前的下拉框的id
-		//根据ID 获取栏目下的分类
-	 	$.get("/article/getCatsByChn",{channelId:cid},function(list){
-		
 		 for(var i in list){
 		  $("#category").append("<option value='"+list[i].id+"'>"+list[i].name+"</option>")
-
 
 		 }
 		 
 	 })
-	}) 
+	})
 })
+	
 
 
 </script>

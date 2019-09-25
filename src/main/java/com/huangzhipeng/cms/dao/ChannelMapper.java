@@ -7,7 +7,7 @@ import com.huangzhipeng.cms.entity.Channel;
 
 
 /**
-*@author 作者:赵玉玺
+*@author huangzhipeng
 *@version 创建时间：2019年9月21日 上午10:26:59
 *频道Mapper
 */

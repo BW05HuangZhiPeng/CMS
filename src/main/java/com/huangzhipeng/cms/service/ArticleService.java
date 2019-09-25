@@ -133,4 +133,14 @@ public interface ArticleService {
 	 * @return
 	 */
 	List<Article> last();
+
+	/**   
+	 * @Title:         getcommentdesc   
+	 * @Description:   TODO
+	 * @param:         @return      
+	 * @return:        PageInfo<Article>     
+	 * @date:          2019年9月25日 上午10:06:38   
+	 * @throws   
+	 */
+	PageInfo<Article> getcommentdesc();
 }

@@ -6,7 +6,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title></title>
+<title>文章详情</title>
+<!-- Bootstrap -->
+<link rel="stylesheet"
+	href="/resource/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css"
+	href="/resource/css/cms.css?v=1.1" />
 <meta name="viewport"
 	content="width=device-width, initial-scale=1">
 <link rel="stylesheet"
@@ -15,9 +20,13 @@
 <script type="text/javascript" src="/resource/js/bootstrap.min.js"></script>
 </head>
 <body>  
-<div class="container">
-		
-		<dl>
+ <div class="container">
+<table>
+   <tbody>
+      <tr>
+         <td>
+          
+            <dl>
 		   <dt><a href="javascript:window.close();history.back()">关闭窗口</a></dt>
 			<dt>${article.title }</dt>
 				<hr>
@@ -53,8 +62,29 @@
 			<dd><div id="commentList"></div></dd>
 			
 		</dl>
-	
+	 
+	 
+         </td>
+         
+         
+        <td>
+          <div class="col-md-3" style="width:1520px;">
+				<div class="card">
+					<div class="card-header">评论排行榜</div>
+					<div class="card-body">
+						<ol>
+							<c:forEach items="${CommentDesc}" var="article">
+								<li class="text-truncate"><a href="/article/getDetail?aId=${article.id}">${article.title}</a></li>
+							</c:forEach>
+						</ol>
+					</div>
+				</div>
+	     </div>
+        </td>
+      </tr>
+   </tbody>
 
+</table>
 </div>
 <script type="text/javascript">
 
@@ -83,7 +113,12 @@
 					history.go(0)
 					//location.href="getDetail" 
 				}else{
-					alert(msg)
+					if (msg=="You are not logged in and cannot comment") {
+						 alert("请登录后再发布评论");
+					}else{
+						alert(msg);
+					}
+					
 				}
 			}
 		})

@@ -48,7 +48,6 @@ public class ArticleServiceImpl implements ArticleService {
 
 	@Override
 	public int add(Article article) {
-		System.err.println(article);
 		return articleMapper.add(article);
 	}
 
@@ -116,6 +115,20 @@ public class ArticleServiceImpl implements ArticleService {
 	@Override
 	public List<Article> last() {
 		return articleMapper.lastArticles();
+	}
+
+	/**   
+	 * @Title:         getcommentdesc
+	 * @Description:   TODO
+	 * @date:          2019年9月25日 上午10:06:49  
+	 * @return   
+	 * @see com.huangzhipeng.cms.service.ArticleService#getcommentdesc()   
+	 */
+	@Override
+	public PageInfo<Article> getcommentdesc() {
+		 PageHelper.startPage(1,10);
+		 List<Article> list=articleMapper.getcommentdesc();
+		return new PageInfo<Article>(list);
 	}
 	
 

@@ -180,6 +180,8 @@ public class ArticleController {
 		Article article = articleService.findById(aId);
 		PageInfo<Article> list = articleService.list(0, article.getChannelId(), 0);
 		List<Article> articleList=list.getList();
+		//查询评论文章天梯
+		PageInfo<Article> desclist=articleService.getcommentdesc();
 		int res=0;
 		for(int i=0;i<articleList.size();i++) {
 			if(articleList.get(i).getId()==article.getId()) {
@@ -202,6 +204,7 @@ public class ArticleController {
 			request.setAttribute("lastArticle", articleList.get(res-1));
 		}
 		request.setAttribute("article", article);
+		request.setAttribute("CommentDesc",desclist.getList());
 		return "index/article/detail";
 	}
 	
