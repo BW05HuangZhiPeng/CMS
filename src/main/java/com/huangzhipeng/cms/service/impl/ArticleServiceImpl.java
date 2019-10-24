@@ -75,6 +75,11 @@ public class ArticleServiceImpl implements ArticleService {
 
 	@Override
 	public int setHot(Integer id, Integer status) {
+		Article article = articleMapper.findById(id);
+		 ListOperations<String, String> opsForList = redisTemplate.opsForList();
+		 Gson gson = new Gson();
+		 String json = gson.toJson(article);
+		 opsForList.leftPush("listhots",json);
 		return articleMapper.updateHot(id,status);
 	}
 
