@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 import com.huangzhipeng.cms.entity.Article;
 
@@ -122,6 +123,37 @@ public interface ArticleMapper {
 	 * @throws   
 	 */
 	List<Article> getcommentdesc();
+
+	/**   
+	 * @Title:         addhits   
+	 * @Description:   TODO
+	 * @param:         @param aId      
+	 * @return:        void     
+	 * @date:          2019年10月16日 下午7:30:38   
+	 * @throws   
+	 */
+	@Update("update cms_article set hits=hits+1,updated=now() where id=#{aId}")
+	void addhits(Integer aId);
+
+	/**   
+	 * @Title:         articlehitsdesc   
+	 * @Description:   TODO
+	 * @param:         @return      
+	 * @return:        List<Article>     
+	 * @date:          2019年10月16日 下午7:36:41   
+	 * @throws   
+	 */
+	List<Article> articlehitsdesc();
+
+	/**   
+	 * @Title:         articleAll   
+	 * @Description:   TODO
+	 * @param:         @return      
+	 * @return:        List<Article>     
+	 * @date:          2019年10月23日 下午7:06:16   
+	 * @throws   
+	 */
+	List<Article> articleAll();
 	
 	
 	

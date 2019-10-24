@@ -125,7 +125,7 @@ public interface ArticleService {
 	 * @param pageSize
 	 * @return
 	 */
-	PageInfo<Article> listhots(String title,Integer pageNum, Integer pageSize);
+	List<Article> listhots(String title,Integer pageNum, Integer pageSize);
 
 	/**
 	 * 获取最新文章
@@ -143,4 +143,43 @@ public interface ArticleService {
 	 * @throws   
 	 */
 	PageInfo<Article> getcommentdesc();
+
+	/**   
+	 * @Title:         addhits   
+	 * @Description:   TODO
+	 * @param:         @param aId      
+	 * @return:        void     
+	 * @date:          2019年10月16日 下午7:30:03   
+	 * @throws   
+	 */
+	void addhits(Article article);
+
+	/**
+	 *获取点击量最高的文章
+	 * @return    
+	 * @Title:         articlehitsdesc   
+	 * @Description:   TODO
+	 * @param:               
+	 * @return:        void     
+	 * @date:          2019年10月16日 下午7:35:35   
+	 * @throws   
+	 */
+	List<Article> articlehitsdesc();
+	
+	
+	//获取所有文章
+	List<Article> articleAll();
+
+	/**   
+	 * @Title:         gethotscount   
+	 * @Description:   TODO
+	 * @param:         @return      
+	 * @return:        int     
+	 * @date:          2019年10月24日 下午2:21:52   
+	 * @throws   
+	 */
+	int gethotscount();
+	
+	
+	
 }

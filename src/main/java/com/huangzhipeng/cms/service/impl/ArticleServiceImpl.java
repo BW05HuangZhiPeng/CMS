@@ -1,12 +1,19 @@
 package com.huangzhipeng.cms.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
+import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.gson.Gson;
 import com.huangzhipeng.cms.dao.ArticleMapper;
 import com.huangzhipeng.cms.entity.Article;
 import com.huangzhipeng.cms.service.ArticleService;
@@ -18,10 +25,15 @@ import com.huangzhipeng.cms.service.ArticleService;
 */
 @Service
 public class ArticleServiceImpl implements ArticleService {
-
+	
+	@Autowired
+	private ElasticsearchTemplate elasticsearchTemplate;
 	
 	@Autowired
 	ArticleMapper articleMapper;
+	
+	@Autowired
+	private RedisTemplate<String,String> redisTemplate;
 	
 	@Override
 	public int post(Article article) {
@@ -53,7 +65,12 @@ public class ArticleServiceImpl implements ArticleService {
 
 	@Override
 	public int check(Integer id, Integer status) {
-		return articleMapper.updateStatus(id,status);
+		int updateStatus = articleMapper.updateStatus(id,status);
+		Article findById = articleMapper.findById(id);
+		IndexQuery build = new IndexQueryBuilder().withId(findById.getId().toString()).withObject(findById).build();
+		String index = elasticsearchTemplate.index(build);
+		
+		return updateStatus;
 	}
 
 	@Override
@@ -102,19 +119,42 @@ public class ArticleServiceImpl implements ArticleService {
 		return new PageInfo<Article>(articles);
 	}
 
+	//查询热门文章利用redis缓存
 	@Override
-	public PageInfo<Article> listhots(String title,Integer pageNum, Integer pageSize) {
-		// TODO Auto-generated method stub
-		PageHelper.startPage(pageNum, pageSize);
-		System.out.println("title   is ============ " + title);
-		List<Article> articles=  articleMapper.hotList(title);
+	public List<Article> listhots(String title,Integer pageNum, Integer pageSize) {
 		
-		return new PageInfo<Article>(articles);
+		if (redisTemplate.hasKey("listhots")&&(title.trim()==null||"".equals(title.trim()))) {
+			 ListOperations<String, String> opsForList = redisTemplate.opsForList();
+			 List<String> range = opsForList.range("listhots",(pageNum-1)*pageSize,pageNum*pageSize-1);
+			 Gson gson = new Gson();
+			 List<Article> articles = new ArrayList<Article>();
+			 int listcount=0;
+			 for (String string : range) {
+				Article article = gson.fromJson(string,Article.class);
+				articles.add(article);
+				listcount++;
+			 }
+			 return articles;
+		}
+		
+		  List<Article> articles= articleMapper.hotList(title);
+		  ListOperations<String, String> opsForList = redisTemplate.opsForList();
+		  Gson gson = new Gson();
+		  List<Article> articles2= articleMapper.hotList(title);
+		  for (Article article : articles2) {
+			  String json = gson.toJson(article);
+			  opsForList.leftPush("listhots",json);
+		  }
+		return articles;
 	}
 
 	@Override
 	public List<Article> last() {
-		return articleMapper.lastArticles();
+		PageHelper.startPage(1,5);
+		List<Article> lastArticles = articleMapper.lastArticles();
+		PageInfo<Article> pageInfo = new PageInfo<Article>(lastArticles);
+		return pageInfo.getList();
+				
 	}
 
 	/**   
@@ -129,6 +169,58 @@ public class ArticleServiceImpl implements ArticleService {
 		 PageHelper.startPage(1,10);
 		 List<Article> list=articleMapper.getcommentdesc();
 		return new PageInfo<Article>(list);
+	}
+
+	/**   
+	 * @Title:         addhits
+	 * @Description:   TODO
+	 * @date:          2019年10月16日 下午7:30:11  
+	 * @param aId   
+	 * @see com.huangzhipeng.cms.service.ArticleService#addhits(java.lang.Integer)   
+	 */
+	@Override
+	public void addhits(Article article) {
+		//数据库中增加点击量
+		articleMapper.addhits(article.getId());
+		
+	}
+
+	/**   
+	 * @return 
+	 * @Title:         articlehitsdesc
+	 * @Description:   TODO
+	 * @date:          2019年10月16日 下午7:35:42     
+	 * @see com.huangzhipeng.cms.service.ArticleService#articlehitsdesc()   
+	 */
+	@Override
+	public List<Article> articlehitsdesc() {
+		return articleMapper.articlehitsdesc();
+	}
+
+	/**   
+	 * @Title:         articleAll
+	 * @Description:   TODO
+	 * @date:          2019年10月23日 下午7:05:47  
+	 * @return   
+	 * @see com.huangzhipeng.cms.service.ArticleService#articleAll()   
+	 */
+	@Override
+	public List<Article> articleAll() {
+		
+		return articleMapper.articleAll();
+	}
+
+	/**   
+	 * @Title:         gethotscount
+	 * @Description:   TODO
+	 * @date:          2019年10月24日 下午2:22:04  
+	 * @return   
+	 * @see com.huangzhipeng.cms.service.ArticleService#gethotscount()   
+	 */
+	@Override
+	public int gethotscount() {
+		ListOperations<String, String> opsForList = redisTemplate.opsForList();
+		return opsForList.size("listhots").intValue();
 	}
 	
 

@@ -52,13 +52,13 @@
 					</ol>
 					<div class="carousel-inner">
 						<div class="carousel-item active">
-							<img class="d-block w-100" src="/pic/1.jpg" alt="First slide">
+							<img class="d-block w-100" src="/pic/12.jpg" alt="First slide">
 						</div>
 						<div class="carousel-item">
-							<img class="d-block w-100" src="/pic/2.jpg" alt="Second slide">
+							<img class="d-block w-100" src="/pic/11.jpg" alt="Second slide">
 						</div>
 						<div class="carousel-item">
-							<img class="d-block w-100" src="/pic/3.jpg" alt="Third slide">
+							<img class="d-block w-100" src="/pic/10.jpg" alt="Third slide">
 						</div>
 					</div>
 					<a class="carousel-control-prev" href="#carousel" role="button"
@@ -123,6 +123,14 @@
 						</ol>
 					</div>
 				</div>
+			   <div class="card">
+			   <div class="card-header">点击率排行</div>
+			     <ol>
+							<c:forEach items="${hits}" var="article">
+								<li class="text-truncate"><a href="/article/getDetail?aId=${article.id}" target="_blank">${article.title}</a></li>
+							</c:forEach>
+						</ol>
+			   </div>
 			   <div class="card">
 			   <div class="card-header">友情链接</div>
 			      <ol>

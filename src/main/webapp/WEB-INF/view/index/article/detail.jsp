@@ -18,6 +18,19 @@
 	href="/resource/css/bootstrap.min.css">
 	<script src="${pageContext.request.contextPath}/resource/js/jquery-3.2.1.js"></script>
 <script type="text/javascript" src="/resource/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/resource/kindeditor/kindeditor-all.js"></script>
+<script type="text/javascript" src="/resource/kindeditor/lang/zh-CN.js" ></script>
+<script>
+        KindEditor.ready(function(K) {
+        	window.editor = K.create('#editor_id',{
+                afterBlur:function(){
+                   this.sync();
+                }
+             });
+
+               // var editor1 = K.create('#editor_id');
+        });
+</script>
 </head>
 <body>  
  <div class="container">
@@ -52,7 +65,7 @@
 			</p>
 			<dd><div>
 				<form action="">
-					<textarea rows="3" cols="100" name="content" placeholder="请输入评论内容......"></textarea>
+					<textarea id="editor_id" name="content" style="width:700px;height:300px;"></textarea>
 					<input type="button" value="评论" onclick="commnent()">
 				</form>
 			</div>

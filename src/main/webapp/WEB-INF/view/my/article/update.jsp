@@ -171,7 +171,6 @@ $(function(){
 		 $("#category").empty();
 		 for(var i in list){
 		  $("#category").append("<option value='"+list[i].id+"'>"+list[i].name+"</option>")
-
 		 }
 		 
 	 })
