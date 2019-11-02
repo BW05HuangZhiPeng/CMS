@@ -33,7 +33,7 @@ public class JsoupTest {
 		int count =0;
 		
 		//获取连接对象
-		Connection connect = Jsoup.connect("https://www.cnblogs.com/");
+		Connection connect = Jsoup.connect("https://www.cnblogs.com/cate/all/");
 		
 		
 		//获取文档对象
@@ -64,7 +64,6 @@ public class JsoupTest {
 				Document article = Jsoup.connect(url).get();
 				//获取文章的内容原属对象
 				Element elementById = article.getElementById("cnblogs_post_body");
-				
 				//判断纯文本是否为空
 				if(elementById !=null) {
 					//获取纯文本内容
@@ -73,7 +72,7 @@ public class JsoupTest {
 					str = str.replace("?","").replace("\"","").replace(":","").replace("/","").replace("*","");
 					
 					//写道文件中
-					FileUtil.writeFile("D:\\1705DJsoup\\" + str + ".txt", content, "utf8");
+					FileUtil.writeFile("D:\\1705DJsoup3\\" + str + ".txt", content, "utf8");
 				}
 				
 				

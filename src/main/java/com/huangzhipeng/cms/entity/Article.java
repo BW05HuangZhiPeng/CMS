@@ -27,6 +27,8 @@ public class Article implements Serializable{
 	
 	private Integer commentCnt;
 	
+	private String phrase;
+	
 	public Integer getCommentCnt() {
 		return commentCnt;
 	}
@@ -84,6 +86,19 @@ public class Article implements Serializable{
 	
 	
 	
+	
+	/**
+	 * @return the phrase
+	 */
+	public String getPhrase() {
+		return phrase;
+	}
+	/**
+	 * @param phrase the phrase to set
+	 */
+	public void setPhrase(String phrase) {
+		this.phrase = phrase;
+	}
 	public String getUsername() {
 		return username;
 	}

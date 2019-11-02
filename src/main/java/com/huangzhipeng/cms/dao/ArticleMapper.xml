@@ -8,9 +8,9 @@
 	<insert id="add" parameterType="Article" keyColumn="id"
 		keyProperty="id" useGeneratedKeys="true">
 		insert into
-		cms_article(status,created,hits,hot,deleted,content,title,picture,channel_id,category_id,user_id)
+		cms_article(status,created,hits,hot,deleted,content,title,picture,channel_id,category_id,user_id,phrase)
 
-		values(0,now(),0,0,0,#{content},#{title},#{picture},#{channelId},#{categoryId},#{userId})
+		values(#{status},#{created},#{hits},#{hot},#{deleted},#{content},#{title},#{picture},#{channelId},#{categoryId},#{userId},#{phrase})
 	</insert>
 	
 	<!--## 删除 ## -->

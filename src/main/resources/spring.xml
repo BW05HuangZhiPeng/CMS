@@ -67,6 +67,11 @@
 <!-- 导入elasticsearch的配置文件 -->
 <import resource="classpath:spring-es.xml"/>
 
+<!-- 导入elasticsearch的配置文件 -->
+<import resource="spring-kafka-producer.xml"/>
+<!-- 导入elasticsearch的配置文件 -->
+<import resource="spring-kafka-consumer.xml"/>
+
 
 <!-- 配置redis -->
 

@@ -36,7 +36,7 @@
 	<!--## 查询 ## -->
 	<select id="findByName" resultType="user">
 		select * from cms_user where
-		username = #{value} limit 1
+		username = #{value} 
 	</select>
 	<select id="findById" resultType="user">
 		select * from cms_user where id=#{value}

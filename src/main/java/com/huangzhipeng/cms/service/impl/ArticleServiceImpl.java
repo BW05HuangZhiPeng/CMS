@@ -9,6 +9,7 @@ import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
@@ -34,6 +35,9 @@ public class ArticleServiceImpl implements ArticleService {
 	
 	@Autowired
 	private RedisTemplate<String,String> redisTemplate;
+	
+	@Autowired
+	private  KafkaTemplate<String,String> kafkaTemplate;
 	
 	@Override
 	public int post(Article article) {
@@ -67,9 +71,17 @@ public class ArticleServiceImpl implements ArticleService {
 	public int check(Integer id, Integer status) {
 		int updateStatus = articleMapper.updateStatus(id,status);
 		Article findById = articleMapper.findById(id);
-		IndexQuery build = new IndexQueryBuilder().withId(findById.getId().toString()).withObject(findById).build();
-		String index = elasticsearchTemplate.index(build);
 		
+		Gson gson = new Gson();
+		if (status==2) {
+			String json = gson.toJson(findById);
+			//发送到消费端
+			kafkaTemplate.sendDefault(json);
+			ListOperations<String, String> opsForList = redisTemplate.opsForList();
+			opsForList.leftPush("listlast",json);
+		}else {
+			elasticsearchTemplate.delete(Article.class,id.toString());
+		}
 		return updateStatus;
 	}
 
@@ -155,10 +167,28 @@ public class ArticleServiceImpl implements ArticleService {
 
 	@Override
 	public List<Article> last() {
-		PageHelper.startPage(1,5);
-		List<Article> lastArticles = articleMapper.lastArticles();
-		PageInfo<Article> pageInfo = new PageInfo<Article>(lastArticles);
-		return pageInfo.getList();
+		ListOperations<String, String> opsForList = redisTemplate.opsForList();
+		List<Article> articles =null;
+		if (redisTemplate.hasKey("listlast")) {
+			List<String> range = opsForList.range("listlast",0,-1);
+			 Gson gson = new Gson();
+			 articles = new ArrayList<Article>();
+			 for (String string : range) {
+				Article article = gson.fromJson(string,Article.class);
+				articles.add(article);
+			 }
+		}else {
+			PageHelper.startPage(1,5);
+			articles = articleMapper.lastArticles();
+			PageInfo<Article> pageInfo = new PageInfo<Article>(articles);
+			 Gson gson = new Gson();
+			for (Article article :pageInfo.getList()) {
+				String json = gson.toJson(article);
+				opsForList.leftPush("listlast",json);
+			}
+			return pageInfo.getList();
+		}
+		return articles;
 				
 	}
 
@@ -199,7 +229,26 @@ public class ArticleServiceImpl implements ArticleService {
 	 */
 	@Override
 	public List<Article> articlehitsdesc() {
-		return articleMapper.articlehitsdesc();
+		ListOperations<String, String> opsForList = redisTemplate.opsForList();
+		List<Article> articles=null;
+		if (redisTemplate.hasKey("articlehitsdesc")) {
+			List<String> range = opsForList.range("articlehitsdesc",0,-1);
+			 Gson gson = new Gson();
+			 articles = new ArrayList<Article>();
+			 for (String string : range) {
+				Article article = gson.fromJson(string,Article.class);
+				articles.add(article);
+			 }
+		}else {
+			articles = articleMapper.articlehitsdesc();
+			 Gson gson = new Gson();
+			for (Article article : articles) {
+				String json = gson.toJson(article);
+				opsForList.leftPush("articlehitsdesc",json);
+			}
+		}
+		
+		return articles;
 	}
 
 	/**   
